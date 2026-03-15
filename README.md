@@ -1,10 +1,17 @@
-# UPI Transaction Analytics Project
-### 70% SQL | 20% Python | 10% Power BI
-#### Real-World Fintech Analytics — No ML, No AI, No DL
+# UPI Digital Payments Analytics
+
+> **Stack:** 70% SQL · 20% Python · 10% Power BI  
+> **Domain:** Real-World Fintech Analytics — No ML · No AI · No DL
 
 ---
 
-## Project Results (From Your Data)
+## Project Summary
+
+End-to-end analytics pipeline built on a synthetic UPI transaction dataset (~50K records). Covers schema design, ETL, KPI reporting, customer segmentation, cohort retention, statistical testing, Monte Carlo simulation, and Power BI dashboarding — replicating the workflow of a payments analyst at PhonePe, Paytm, or Razorpay.
+
+---
+
+## Project Results (From the Data)
 
 | Metric | Value |
 |---|---|
@@ -20,126 +27,171 @@
 
 ---
 
-## Folder Structure
+## Folder & File Structure
 
 ```
-upi_analytics/
-├── README.md
-├── upi_analytics.db              ← SQLite database (auto-generated)
+upi-digital-payments-analytics-main/
 │
-├── data/                         ← Your CSV source files
-│   ├── fact_transactions_50k.csv
-│   ├── dim_customer_50k.csv
-│   ├── dim_merchant_50k.csv
-│   ├── dim_channel_50k.csv
-│   ├── dim_city_50k.csv
-│   └── dim_date_50k.csv
+├── README.md                          ← You are here
 │
-├── sql/                          ← 70% of project work
+├── 01_sql/                            ← 70% of project (11 SQL scripts)
 │   ├── 01_ddl_create_tables.sql
-│   ├── 02_etl_data_quality.sql
-│   ├── 03_core_kpis.sql
-│   ├── 04_channel_geo_analysis.sql
-│   ├── 05_cohort_retention.sql
-│   ├── 06_rfm_clv_segmentation.sql
-│   └── 07_cashback_roi_whatif.sql
+│   ├── 02_etl_load_data.sql
+│   ├── 03_data_quality_checks.sql
+│   ├── 04_core_kpis.sql
+│   ├── 05_channel_analysis.sql
+│   ├── 06_geo_analysis.sql
+│   ├── 07_user_behavior_dau_mau.sql
+│   ├── 08_cohort_retention.sql
+│   ├── 09_rfm_segmentation.sql
+│   ├── 10_clv_and_churn_risk.sql
+│   └── 11_cashback_processing_retry_whatif.sql
 │
-├── python/                       ← 20% of project work
+├── 02_python/                         ← 20% of project (4 Python scripts)
 │   ├── 00_setup_database.py
-│   ├── 01_eda_visuals.py
-│   └── 02_statistical_analysis.py
+│   ├── 01_eda_analysis.py
+│   ├── 02_statistical_analysis.py
+│   ├── 03_monte_carlo_whatif.py
+│   ├── upi_analytics.db               ← Auto-generated SQLite database
+│   └── outputs/
+│       ├── eda/                       ← 9 EDA charts (PNG)
+│       └── stats/                     ← 7 statistical charts (PNG)
 │
-├── powerbi/
-│   └── powerbi_dax_measures.md
+├── 03_powerbi/
+│   └── powerbi_dax_and_dashboard_guide.md   ← All DAX measures + dashboard wireframes
 │
-└── outputs/                      ← All generated files
-    ├── kpi_results.xlsx
+└── outputs/                           ← Final dashboard exports
     ├── 01_executive_kpi_dashboard.png
     ├── 02_channel_analysis.png
-    ├── 03_geo_analysis.png
-    ├── 04_cohort_retention_heatmap.png
-    ├── 05_rfm_segmentation.png
-    ├── 06_churn_risk_funnel.png
-    ├── 07_dau_mau_stickiness.png
-    ├── 08_transaction_quality.png
-    ├── 09_bootstrap_margin_ci.png
-    ├── 10_ab_test_cashback.png
-    ├── 11_monte_carlo_whatif.png
-    └── 12_clv_analysis.png
+    └── 03_geo_analysis.png
 ```
+
+---
+
+## File-by-File Explanation
+
+### `01_sql/` — SQL Layer (70%)
+
+| File | Purpose | Key SQL Concepts |
+|---|---|---|
+| `01_ddl_create_tables.sql` | Defines the star-schema — fact and dimension tables for transactions, customers, merchants, channels, cities, and dates | `CREATE TABLE`, `PRIMARY KEY`, `FOREIGN KEY`, `INDEX` |
+| `02_etl_load_data.sql` | Loads raw CSV data into the SQLite schema; handles type casting and null-safe inserts | `INSERT INTO`, `CAST`, `COALESCE` |
+| `03_data_quality_checks.sql` | Validates completeness and accuracy — checks for nulls, duplicates, orphan keys, and out-of-range amounts | `COUNT DISTINCT`, `IS NULL`, `CASE WHEN`, integrity checks |
+| `04_core_kpis.sql` | Computes platform-level KPIs: GMV, Net Revenue, Margin %, MAU, Avg Ticket Size, and Month-over-Month growth | `SUM`, `AVG`, `LAG()`, Window functions |
+| `05_channel_analysis.sql` | Breaks down performance by payment channel (UPI, Wallet, Card, Net Banking) — volume, GMV, revenue, and margin per channel | `GROUP BY`, `RANK()`, `NULLIF`, `ROUND` |
+| `06_geo_analysis.sql` | Geographic GMV and transaction distribution across cities and states; identifies top-performing and underperforming regions | `JOIN`, `GROUP BY`, `ORDER BY`, `DENSE_RANK()` |
+| `07_user_behavior_dau_mau.sql` | Computes Daily Active Users (DAU), Monthly Active Users (MAU), and the DAU/MAU stickiness ratio over time | `COUNT DISTINCT`, date truncation, Window functions |
+| `08_cohort_retention.sql` | Builds a month-0 cohort table and tracks user retention at M1, M3, and M6; feeds the cohort heatmap | Multi-CTE, `JULIANDAY`, date arithmetic |
+| `09_rfm_segmentation.sql` | Scores every customer on Recency, Frequency, and Monetary value; assigns RFM tiers (Champions, At-Risk, Lost, etc.) | `NTILE`, percentile thresholds, `CASE WHEN` scoring |
+| `10_clv_and_churn_risk.sql` | Estimates Customer Lifetime Value using historical ARPU and retention; flags churn-risk users based on recency thresholds | CTEs, conditional aggregation, `CASE WHEN` tiering |
+| `11_cashback_processing_retry_whatif.sql` | Models cashback ROI, payment retry success impact, and six What-If pricing scenarios (MDR ±0.5%, cashback ±0.3%) | `UNION ALL`, `CASE WHEN` arithmetic, scenario modeling |
+
+---
+
+### `02_python/` — Python Layer (20%)
+
+| File | Purpose |
+|---|---|
+| `00_setup_database.py` | Bootstraps the project: reads CSVs, creates the SQLite DB, runs all SQL KPI scripts programmatically, and exports results to Excel |
+| `01_eda_analysis.py` | Generates 9 EDA charts: GMV/revenue trend, MoM growth, channel mix, geo GMV bar chart, transaction amount distribution, user trends, success/retry rates, cashback analysis, and hour-vs-month heatmap |
+| `02_statistical_analysis.py` | Runs rigorous statistics: Bootstrap 95% CI for margin, Welch's t-test + Mann-Whitney U for cashback A/B test, Cohen's d effect size, Chi-square repeat rate test, cohort retention heatmap, RFM scatter, CLV Lorenz curve, and churn funnel |
+| `03_monte_carlo_whatif.py` | Runs 5,000-iteration Monte Carlo simulation to model revenue uncertainty under cashback reduction scenarios; outputs probability bands for net revenue outcomes |
+| `upi_analytics.db` | Auto-generated SQLite database — produced by `00_setup_database.py`; stores all fact/dim tables and intermediate query results |
+
+#### `02_python/outputs/eda/` — EDA Charts
+| Chart | What it shows |
+|---|---|
+| `01_gmv_revenue_trend.png` | Monthly GMV and net revenue over time |
+| `02_mom_growth.png` | Month-over-month growth rate (%) |
+| `03_channel_mix.png` | Transaction share by payment channel |
+| `04_geo_gmv.png` | GMV by city/state |
+| `05_amount_distribution.png` | Histogram of transaction amounts |
+| `06_user_trends.png` | DAU/MAU stickiness over time |
+| `07_success_retry.png` | Transaction success vs retry rates |
+| `08_cashback_analysis.png` | Cashback spend vs non-cashback spend comparison |
+| `09_hour_month_heatmap.png` | Transaction volume heatmap by hour and month |
+
+#### `02_python/outputs/stats/` — Statistical Charts
+| Chart | What it shows |
+|---|---|
+| `01_bootstrap_margin_ci.png` | Bootstrap distribution with 95% CI for platform margin |
+| `02_cohort_retention_heatmap.png` | Cohort retention grid M0→M6 |
+| `03_rfm_segments.png` | RFM segment scatter (Recency vs Frequency, sized by Monetary) |
+| `04_clv_distribution.png` | Customer Lifetime Value distribution |
+| `05_churn_risk_funnel.png` | Funnel of active → at-risk → churned users |
+| `06_ab_cashback_repeat_rate.png` | A/B test result: repeat rate with vs without cashback |
+| `07_channel_margin_ci.png` | Margin confidence intervals by payment channel |
+
+---
+
+### `03_powerbi/`
+
+| File | Purpose |
+|---|---|
+| `powerbi_dax_and_dashboard_guide.md` | Complete Power BI reference: all DAX measures (GMV, Margin, MAU, Retention Rate, CLV), dashboard layout wireframes for 3 dashboards, and slicer/filter setup guide |
+
+#### Power BI Dashboards (3 Pages)
+| Dashboard | Purpose | Key Visuals |
+|---|---|---|
+| **1. Executive KPI** | Platform health at a glance | KPI cards, GMV trend line, channel mix donut, geo map |
+| **2. Customer Behavior** | Retention and engagement deep dive | Cohort heatmap, RFM treemap, churn funnel |
+| **3. Revenue Efficiency** | Profitability and scenario planning | Margin by channel, cashback ROI bar, What-If parameter slider |
+
+---
+
+### `outputs/` — Final Exports
+
+| File | Description |
+|---|---|
+| `01_executive_kpi_dashboard.png` | Exported screenshot of Power BI Executive KPI dashboard |
+| `02_channel_analysis.png` | Channel-wise performance breakdown visual |
+| `03_geo_analysis.png` | Geographic GMV heatmap / bar chart |
 
 ---
 
 ## How to Run
 
 ```bash
-# 1. Install dependencies
+# 1. Install Python dependencies
 pip install pandas numpy matplotlib seaborn scipy openpyxl
 
-# 2. Run in order
-python python/00_setup_database.py   # Load CSVs → SQLite, export Excel
-python python/01_eda_visuals.py      # 8 EDA charts
-python python/02_statistical_analysis.py  # Stats + Monte Carlo
+# 2. Run scripts in order
+python 02_python/00_setup_database.py        # Load CSVs → SQLite, export Excel
+python 02_python/01_eda_analysis.py          # Generate 9 EDA charts
+python 02_python/02_statistical_analysis.py  # Bootstrap, A/B test, CLV, RFM
+python 02_python/03_monte_carlo_whatif.py    # Monte Carlo simulation (5,000 runs)
+
+# 3. Open Power BI
+# Import upi_analytics.db as a data source
+# Apply DAX measures from 03_powerbi/powerbi_dax_and_dashboard_guide.md
 ```
 
 ---
 
-## SQL Files Coverage (70%)
+## Key Analytical Findings
 
-| File | Business Question | SQL Concepts Used |
-|---|---|---|
-| 01_ddl | Schema design | CREATE, INDEX, FK |
-| 02_etl | Data quality | NULL checks, DISTINCT, CASE WHEN |
-| 03_kpis | GMV, Revenue, Margin, MAU, MoM | SUM, AVG, COUNT DISTINCT, LAG(), Window |
-| 04_channel_geo | Channel Mix, Geo GMV, Efficiency | JOIN, GROUP BY, RANK(), NULLIF |
-| 05_cohort | Retention M1/M3/M6, Churn funnel | Multi-CTE, JULIANDAY, date math |
-| 06_rfm_clv | RFM Scoring, CLV Pareto | Percentile thresholds, NTILE concept |
-| 07_whatif | Cashback ROI, What-If 6 scenarios | UNION ALL, CASE WHEN arithmetic |
+1. **Cashback drives measurable behavior change** — A/B test result: cashback users spend 43% more (p < 0.0001, Cohen's d = 0.46). Chi-square confirms a significantly higher repeat transaction rate.
 
----
+2. **Margin is structurally thin at 0.298%** — Bootstrap 95% CI [0.27%, 0.33%] shows low volatility. A +0.5% MDR increase alone would more than double net revenue.
 
-## Python Coverage (20%)
+3. **WALLET channel is the most efficient** — Highest margin at 0.326% despite lower volume. CARD has the lowest margin at 0.274%, suggesting renegotiation opportunity.
 
-| Script | What it does |
-|---|---|
-| 00_setup_database | Loads CSVs → SQLite, runs all SQL KPIs, exports Excel |
-| 01_eda_visuals | 8 production-quality charts (GMV trends, channel, cohort heatmap, RFM, churn) |
-| 02_statistical_analysis | Bootstrap CI, Welch's t-test, Mann-Whitney U, Cohen's d, Chi-square, Monte Carlo (5000 simulations), CLV Lorenz curve |
+4. **Cashback reduction carries real revenue risk** — Monte Carlo simulation shows high variance in net revenue outcomes if cashback is cut without accounting for GMV elasticity.
+
+5. **Top 10% of customers generate disproportionate revenue** — The CLV Lorenz curve confirms Pareto distribution. Champions and Loyal segments (RFM) should be the primary retention investment.
 
 ---
 
-## Power BI (10%) — 3 Dashboards
+## Business Impact
 
-| Dashboard | Purpose | Key Visuals |
-|---|---|---|
-| **1. Executive KPI** (MAIN) | Platform health at a glance | KPI cards, GMV trend, Channel mix pie, Geo map |
-| **2. Customer Behavior** | Retention & engagement | Cohort heatmap, RFM treemap, Churn funnel |
-| **3. Revenue Efficiency** | Profitability deep dive | Margin by channel, Cashback ROI, What-If slider |
+1. **Revenue Leakage Identification** — The What-If SQL module and Monte Carlo simulation quantify exactly how much revenue is left on the table under current MDR and cashback settings. A +0.5% MDR adjustment is shown to more than double net revenue, giving the pricing team a data-backed negotiation lever with merchants and banks.
 
-See `powerbi/powerbi_dax_measures.md` for all DAX measures and layout wireframes.
+2. **Targeted Customer Retention at Scale** — RFM segmentation and CLV analysis identify which customers are worth retaining (Champions, Loyalists) vs which are already lost. This directly reduces wasted cashback spend on low-LTV users and enables hyper-personalized re-engagement campaigns.
 
----
+3. **Cashback ROI Accountability** — The A/B test framework (Welch's t-test + Chi-square) proves cashback increases spend by 43% with statistical confidence. This transforms cashback from a cost center into a measurable growth lever — justifiable to CFOs with p-values and effect sizes.
 
-## Key Findings (Interview-Ready)
+4. **Early Churn Signal for Proactive Intervention** — The cohort retention and churn risk funnel flag at-risk users before they fully disengage (M1/M3 drop-off visible in heatmap). Product and CRM teams can trigger re-activation nudges at the right moment, improving 6-month retention rates.
 
-1. **Cashback is driving real behavior**: A/B test shows cashback users spend 43% more (p < 0.0001, Cohen's d = 0.46). Chi-square confirms significantly higher repeat rate.
-
-2. **Margin is thin (0.298%)**: Bootstrap CI [0.27%, 0.33%] — tight band, low volatility. MDR change of +0.5% would more than double net revenue.
-
-3. **WALLET has highest margin** (0.326%) despite lower volume. CARD has lowest (0.274%).
-
-4. **Monte Carlo shows cashback reduction is risky**: Assuming GMV elasticity to cashback exists, the model simulates impact with uncertainty bands.
-
-5. **Top 10% of customers** generate disproportionate revenue (Lorenz curve — Pareto principle holds).
+5. **Channel Strategy Optimization** — Geo and channel analysis surfaces that WALLET generates the highest margin while CARD underperforms. This guides partnership prioritization — invest in wallet integrations, renegotiate card MDR, and allocate marketing budget to high-GMV cities with low penetration.
 
 ---
-
-## Companies & Roles Targeting This Project
-
-| Company | Role |
-|---|---|
-| PhonePe, Paytm, Google Pay | Product Analyst, Growth Analyst |
-| JPMorgan, Citi, HSBC | Data Analyst — Payments |
-| Razorpay, PayU, Pine Labs | Business Analyst |
-| NPCI-related | Analytics / Ops Analyst |
-| Consulting (EY, Deloitte, KPMG) | Analytics Consultant |
