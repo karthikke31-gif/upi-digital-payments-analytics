@@ -22,6 +22,14 @@ End-to-end analytics pipeline built on a synthetic UPI transaction dataset (~50K
 
 ---
 
+# Power BI Dashboard Preview
+
+### Enterprise Digital Performance Dashboard
+
+![Enterprise Digital Performance Dashboard](https://raw.githubusercontent.com/karthikke31-gif/upi-digital-payments-analytics/4564a6f00ec35b3995d3b4f36c06744cc069cd65/Screenshot%202026-03-15%20at%205.48.49%E2%80%AFPM.png)
+
+---
+
 ## Folder & File Structure
 
 ```
