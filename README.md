@@ -25,11 +25,17 @@ End-to-end analytics pipeline built on a synthetic UPI transaction dataset (~50K
 ## Folder & File Structure
 
 ```
-upi-digital-payments-analytics-main/
+upi-digital-payments-analytics
 │
-├── README.md                          
+├── dataset/
+│   ├── dim_channel_50k.csv
+│   ├── dim_city_50k.csv
+│   ├── dim_customer_50k.csv
+│   ├── dim_date_50k.csv
+│   ├── dim_merchant_50k.csv
+│   └── fact_transactions_50k.csv
 │
-├── 01_sql/                            
+├── 01_sql/
 │   ├── 01_ddl_create_tables.sql
 │   ├── 02_etl_load_data.sql
 │   ├── 03_data_quality_checks.sql
@@ -42,23 +48,25 @@ upi-digital-payments-analytics-main/
 │   ├── 10_clv_and_churn_risk.sql
 │   └── 11_cashback_processing_retry_whatif.sql
 │
-├── 02_python/                        
+├── 02_python/
 │   ├── 00_setup_database.py
 │   ├── 01_eda_analysis.py
 │   ├── 02_statistical_analysis.py
 │   ├── 03_monte_carlo_whatif.py
-│   ├── upi_analytics.db               
+│   ├── upi_analytics.db
 │   └── outputs/
-│       ├── eda/                      
-│       └── stats/                     
+│       ├── eda/
+│       └── stats/
 │
 ├── 03_powerbi/
-│   └── powerbi_dax_and_dashboard_guide.md   ← All DAX measures + dashboard wireframes
+│   └── powerbi_dax_and_dashboard_guide.md
 │
-└── outputs/                           ← Final dashboard exports
-    ├── 01_executive_kpi_dashboard.png
-    ├── 02_channel_analysis.png
-    └── 03_geo_analysis.png
+├── outputs/
+│   ├── 01_executive_kpi_dashboard.png
+│   ├── 02_channel_analysis.png
+│   └── 03_geo_analysis.png
+│
+└── README.md
 ```
 
 ---
