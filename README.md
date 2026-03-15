@@ -193,4 +193,5 @@ The cohort retention and churn risk funnel flag at-risk users before they fully 
 
 **5. 🗺️ Channel Strategy Optimization**
 Geo and channel analysis surfaces that `WALLET` generates the highest margin while `CARD` underperforms. This guides partnership prioritization — invest in wallet integrations, renegotiate card MDR, and allocate marketing budget to high-GMV cities with low penetration.
+
 ---
