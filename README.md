@@ -1,14 +1,9 @@
 # UPI Digital Payments Analytics
-
-> **Stack:** 70% SQL · 20% Python · 10% Power BI  
-> **Domain:** Real-World Fintech Analytics — No ML · No AI · No DL
-
 ---
 
 ## Project Summary
 
-End-to-end analytics pipeline built on a synthetic UPI transaction dataset (~50K records). Covers schema design, ETL, KPI reporting, customer segmentation, cohort retention, statistical testing, Monte Carlo simulation, and Power BI dashboarding — replicating the workflow of a payments analyst at PhonePe, Paytm, or Razorpay.
-
+End-to-end analytics pipeline built on a synthetic UPI transaction dataset (~50K records). Covers schema design, ETL, KPI reporting, customer segmentation, cohort retention, statistical testing, and Power BI 
 ---
 
 ## Project Results (From the Data)
@@ -32,9 +27,9 @@ End-to-end analytics pipeline built on a synthetic UPI transaction dataset (~50K
 ```
 upi-digital-payments-analytics-main/
 │
-├── README.md                          ← You are here
+├── README.md                          
 │
-├── 01_sql/                            ← 70% of project (11 SQL scripts)
+├── 01_sql/                            
 │   ├── 01_ddl_create_tables.sql
 │   ├── 02_etl_load_data.sql
 │   ├── 03_data_quality_checks.sql
@@ -47,15 +42,15 @@ upi-digital-payments-analytics-main/
 │   ├── 10_clv_and_churn_risk.sql
 │   └── 11_cashback_processing_retry_whatif.sql
 │
-├── 02_python/                         ← 20% of project (4 Python scripts)
+├── 02_python/                        
 │   ├── 00_setup_database.py
 │   ├── 01_eda_analysis.py
 │   ├── 02_statistical_analysis.py
 │   ├── 03_monte_carlo_whatif.py
-│   ├── upi_analytics.db               ← Auto-generated SQLite database
+│   ├── upi_analytics.db               
 │   └── outputs/
-│       ├── eda/                       ← 9 EDA charts (PNG)
-│       └── stats/                     ← 7 statistical charts (PNG)
+│       ├── eda/                      
+│       └── stats/                     
 │
 ├── 03_powerbi/
 │   └── powerbi_dax_and_dashboard_guide.md   ← All DAX measures + dashboard wireframes
@@ -70,7 +65,7 @@ upi-digital-payments-analytics-main/
 
 ## File-by-File Explanation
 
-### `01_sql/` — SQL Layer (70%)
+### `01_sql/` 
 
 | File | Purpose | Key SQL Concepts |
 |---|---|---|
@@ -88,14 +83,13 @@ upi-digital-payments-analytics-main/
 
 ---
 
-### `02_python/` — Python Layer (20%)
+### `02_python/` 
 
 | File | Purpose |
 |---|---|
 | `00_setup_database.py` | Bootstraps the project: reads CSVs, creates the SQLite DB, runs all SQL KPI scripts programmatically, and exports results to Excel |
 | `01_eda_analysis.py` | Generates 9 EDA charts: GMV/revenue trend, MoM growth, channel mix, geo GMV bar chart, transaction amount distribution, user trends, success/retry rates, cashback analysis, and hour-vs-month heatmap |
 | `02_statistical_analysis.py` | Runs rigorous statistics: Bootstrap 95% CI for margin, Welch's t-test + Mann-Whitney U for cashback A/B test, Cohen's d effect size, Chi-square repeat rate test, cohort retention heatmap, RFM scatter, CLV Lorenz curve, and churn funnel |
-| `03_monte_carlo_whatif.py` | Runs 5,000-iteration Monte Carlo simulation to model revenue uncertainty under cashback reduction scenarios; outputs probability bands for net revenue outcomes |
 | `upi_analytics.db` | Auto-generated SQLite database — produced by `00_setup_database.py`; stores all fact/dim tables and intermediate query results |
 
 #### `02_python/outputs/eda/` — EDA Charts
@@ -182,16 +176,21 @@ python 02_python/03_monte_carlo_whatif.py    # Monte Carlo simulation (5,000 run
 
 ---
 
-## Business Impact
+## 💼 Business Impact
 
-1. **Revenue Leakage Identification** — The What-If SQL module and Monte Carlo simulation quantify exactly how much revenue is left on the table under current MDR and cashback settings. A +0.5% MDR adjustment is shown to more than double net revenue, giving the pricing team a data-backed negotiation lever with merchants and banks.
 
-2. **Targeted Customer Retention at Scale** — RFM segmentation and CLV analysis identify which customers are worth retaining (Champions, Loyalists) vs which are already lost. This directly reduces wasted cashback spend on low-LTV users and enables hyper-personalized re-engagement campaigns.
+**1. 💰 Revenue Leakage Identification**
+The What-If SQL module quantifies exactly how much revenue is left on the table under current MDR and cashback settings. A `+0.5% MDR` adjustment is shown to more than double net revenue — giving the pricing team a data-backed negotiation lever with merchants and banks.
 
-3. **Cashback ROI Accountability** — The A/B test framework (Welch's t-test + Chi-square) proves cashback increases spend by 43% with statistical confidence. This transforms cashback from a cost center into a measurable growth lever — justifiable to CFOs with p-values and effect sizes.
+**2. 🎯 Targeted Customer Retention at Scale**
+RFM segmentation and CLV analysis identify which customers are worth retaining *(Champions, Loyalists)* vs which are already lost. This directly reduces wasted cashback spend on low-LTV users and enables hyper-personalized re-engagement campaigns.
 
-4. **Early Churn Signal for Proactive Intervention** — The cohort retention and churn risk funnel flag at-risk users before they fully disengage (M1/M3 drop-off visible in heatmap). Product and CRM teams can trigger re-activation nudges at the right moment, improving 6-month retention rates.
+**3. 📊 Cashback ROI Accountability**
+The A/B test framework *(Welch's t-test + Chi-square)* proves cashback increases spend by **43%** with statistical confidence `(p < 0.0001)`. This transforms cashback from a cost center into a measurable growth lever — justifiable to CFOs with p-values and effect sizes.
 
-5. **Channel Strategy Optimization** — Geo and channel analysis surfaces that WALLET generates the highest margin while CARD underperforms. This guides partnership prioritization — invest in wallet integrations, renegotiate card MDR, and allocate marketing budget to high-GMV cities with low penetration.
+**4. 🚨 Early Churn Signal for Proactive Intervention**
+The cohort retention and churn risk funnel flag at-risk users before they fully disengage *(M1/M3 drop-off visible in heatmap)*. Product and CRM teams can trigger re-activation nudges at the right moment, improving 6-month retention rates.
 
+**5. 🗺️ Channel Strategy Optimization**
+Geo and channel analysis surfaces that `WALLET` generates the highest margin while `CARD` underperforms. This guides partnership prioritization — invest in wallet integrations, renegotiate card MDR, and allocate marketing budget to high-GMV cities with low penetration.
 ---
