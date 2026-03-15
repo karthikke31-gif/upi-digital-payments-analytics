@@ -10,10 +10,10 @@ End-to-end analytics pipeline built on a synthetic UPI transaction dataset (~50K
 
 | Metric | Value |
 |---|---|
-| Total GMV | ₹1,42,70,055 |
-| Net Revenue | ₹42,531 |
-| Platform Margin % | 0.298% |
-| Total Transactions | 47,548 |
+| Total GMV | ₹ 15.02M |
+| Net Revenue | ₹-136.15K |
+| Platform Margin % | -0.91% |
+| Total Transactions | 50.00K |
 | Unique Customers | 14,379 |
 | Avg Ticket Size | ₹300.12 |
 | Cashback Rate | 1.13% of GMV |
