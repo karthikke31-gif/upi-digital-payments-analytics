@@ -1,0 +1,5 @@
+churn_risk,customer_count,avg_days_inactive,at_risk_gmv,sort_order
+High Risk,7860,153.76857506361324,6610691.61,0
+Medium Risk,3012,46.96713147410359,3432277.47,1
+Slipping Away,2,43.0,2428.49,2
+Active,3505,14.25363766048502,4224658.24,3
