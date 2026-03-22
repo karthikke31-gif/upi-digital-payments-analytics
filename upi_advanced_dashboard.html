@@ -1,0 +1,1114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>UPI Advanced Analytics — Deep Insights</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Figtree:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #f5f4f0;
+    --surface: #ffffff;
+    --surface2: #faf9f6;
+    --border: #e8e5de;
+    --text-primary: #1a1714;
+    --text-secondary: #6b6560;
+    --text-muted: #a09890;
+    --accent1: #2d5be3;   /* electric blue */
+    --accent2: #e35c2d;   /* warm orange */
+    --accent3: #1d9e6b;   /* emerald */
+    --accent4: #c47d12;   /* amber */
+    --accent5: #8b3fc7;   /* violet */
+    --shadow-sm: 0 1px 4px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
+    --shadow-md: 0 2px 8px rgba(0,0,0,0.07), 0 8px 32px rgba(0,0,0,0.06);
+    --radius: 16px;
+    --radius-sm: 10px;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  
+  body {
+    font-family: 'Figtree', sans-serif;
+    background: var(--bg);
+    color: var(--text-primary);
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* ─── HEADER ─────────────────────────────────────── */
+  header {
+    background: var(--text-primary);
+    padding: 28px 40px 24px;
+    display: flex; align-items: flex-end; justify-content: space-between;
+    position: sticky; top: 0; z-index: 100;
+  }
+  header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    color: #fff;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+  }
+  header p {
+    font-size: 12px;
+    color: rgba(255,255,255,0.45);
+    margin-top: 3px;
+    font-weight: 400;
+  }
+  .header-badge {
+    display: flex; gap: 8px;
+  }
+  .badge {
+    font-size: 10.5px; font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 20px;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+  }
+  .badge-blue  { background: rgba(45,91,227,0.25); color: #7fa4ff; }
+  .badge-green { background: rgba(29,158,107,0.25); color: #5fd4a5; }
+  .badge-warn  { background: rgba(196,125,18,0.25);  color: #f0b94a; }
+
+  /* ─── LAYOUT ─────────────────────────────────────── */
+  main {
+    padding: 32px 40px 60px;
+    max-width: 1440px;
+    margin: 0 auto;
+  }
+  .section-label {
+    font-size: 11px; font-weight: 700; letter-spacing: 1.2px;
+    text-transform: uppercase; color: var(--text-muted);
+    margin-bottom: 14px; margin-top: 36px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .section-label::after {
+    content: ''; flex: 1; height: 1px; background: var(--border);
+  }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; }
+  .grid-5 { display: grid; grid-template-columns: repeat(5,1fr); gap: 16px; }
+  .col-span-2 { grid-column: span 2; }
+  .col-span-3 { grid-column: span 3; }
+
+  /* ─── CARD ────────────────────────────────────────── */
+  .card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 24px 26px;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border);
+    transition: box-shadow 0.2s;
+  }
+  .card:hover { box-shadow: var(--shadow-md); }
+  .card-title {
+    font-size: 13px; font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+    letter-spacing: -0.1px;
+  }
+  .card-sub {
+    font-size: 11.5px; color: var(--text-muted);
+    margin-bottom: 18px;
+  }
+
+  /* ─── MINI STAT CARD ──────────────────────────────── */
+  .stat-card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 20px 22px;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .stat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+  .stat-card::before {
+    content: ''; position: absolute;
+    top: 0; left: 0; right: 0; height: 3px;
+  }
+  .stat-card.blue::before  { background: var(--accent1); }
+  .stat-card.orange::before{ background: var(--accent2); }
+  .stat-card.green::before { background: var(--accent3); }
+  .stat-card.amber::before { background: var(--accent4); }
+  .stat-card.violet::before{ background: var(--accent5); }
+
+  .stat-icon {
+    width: 36px; height: 36px; border-radius: 10px;
+    display: grid; place-items: center;
+    font-size: 16px; margin-bottom: 12px;
+  }
+  .icon-blue   { background: rgba(45,91,227,0.10); }
+  .icon-orange { background: rgba(227,92,45,0.10); }
+  .icon-green  { background: rgba(29,158,107,0.10); }
+  .icon-amber  { background: rgba(196,125,18,0.10); }
+  .icon-violet { background: rgba(139,63,199,0.10); }
+
+  .stat-value {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px; font-weight: 700;
+    line-height: 1.1; letter-spacing: -0.5px;
+    color: var(--text-primary);
+  }
+  .stat-label { font-size: 11.5px; color: var(--text-muted); margin-top: 4px; font-weight: 500; }
+  .stat-delta {
+    font-size: 11px; font-weight: 700;
+    margin-top: 8px; display: inline-flex; align-items: center; gap: 3px;
+    padding: 2px 8px; border-radius: 20px;
+  }
+  .delta-up   { background: rgba(29,158,107,0.1); color: #1d9e6b; }
+  .delta-down { background: rgba(227,92,45,0.1);  color: #e35c2d; }
+  .delta-neu  { background: rgba(107,101,96,0.1);  color: #6b6560; }
+
+  /* ─── CHART CONTAINER ─────────────────────────────── */
+  .chart-wrap { position: relative; width: 100%; }
+
+  /* ─── RFM SEGMENTS ────────────────────────────────── */
+  .rfm-grid {
+    display: grid;
+    grid-template-columns: repeat(4,1fr);
+    gap: 10px;
+    margin-top: 4px;
+  }
+  .rfm-pill {
+    border-radius: 12px;
+    padding: 14px 16px;
+    border: 1px solid transparent;
+  }
+  .rfm-pill .name { font-size: 12px; font-weight: 700; margin-bottom: 4px; }
+  .rfm-pill .count { font-size: 22px; font-weight: 700; font-family: 'Playfair Display', serif; }
+  .rfm-pill .pct { font-size: 11px; margin-top: 2px; opacity: 0.75; }
+
+  .rfm-champions  { background: rgba(45,91,227,0.07);   border-color: rgba(45,91,227,0.18);  color: var(--accent1); }
+  .rfm-loyal      { background: rgba(29,158,107,0.07);  border-color: rgba(29,158,107,0.18); color: var(--accent3); }
+  .rfm-potential  { background: rgba(196,125,18,0.07);  border-color: rgba(196,125,18,0.18); color: var(--accent4); }
+  .rfm-atrisk     { background: rgba(227,92,45,0.07);   border-color: rgba(227,92,45,0.18);  color: var(--accent2); }
+  .rfm-new        { background: rgba(139,63,199,0.07);  border-color: rgba(139,63,199,0.18); color: var(--accent5); }
+  .rfm-hibernate  { background: rgba(107,101,96,0.07);  border-color: rgba(107,101,96,0.18); color: var(--text-secondary); }
+  .rfm-lost       { background: rgba(26,23,20,0.05);    border-color: rgba(26,23,20,0.12);   color: var(--text-primary); }
+  .rfm-cantlose   { background: rgba(196,18,18,0.07);   border-color: rgba(196,18,18,0.18);  color: #c41212; }
+
+  /* ─── CHURN FUNNEL ────────────────────────────────── */
+  .funnel-bar {
+    display: flex; align-items: center; gap: 14px;
+    margin-bottom: 12px;
+  }
+  .funnel-label { font-size: 12px; font-weight: 600; width: 100px; flex-shrink: 0; }
+  .funnel-track { flex: 1; background: var(--border); border-radius: 20px; height: 28px; position: relative; overflow: hidden; }
+  .funnel-fill {
+    height: 100%;
+    border-radius: 20px;
+    display: flex; align-items: center; padding-left: 12px;
+    font-size: 12px; font-weight: 700; color: #fff;
+    transition: width 1s cubic-bezier(0.4,0,0.2,1);
+  }
+  .funnel-count { font-size: 12px; color: var(--text-secondary); font-weight: 600; width: 60px; text-align: right; flex-shrink: 0; }
+
+  /* ─── COHORT TABLE ────────────────────────────────── */
+  .cohort-wrap { overflow-x: auto; margin-top: 8px; }
+  .cohort-table { border-collapse: collapse; width: 100%; font-size: 11.5px; }
+  .cohort-table th {
+    padding: 8px 10px; text-align: center;
+    font-weight: 700; font-size: 10.5px; letter-spacing: 0.3px;
+    color: var(--text-muted); text-transform: uppercase;
+    border-bottom: 1px solid var(--border);
+  }
+  .cohort-table td {
+    padding: 6px 8px; text-align: center;
+    font-size: 11px; font-weight: 600; color: #fff;
+    border-radius: 6px;
+  }
+  .cohort-table td.month-label {
+    color: var(--text-primary); font-weight: 700; text-align: left;
+    background: transparent !important; font-size: 11.5px;
+  }
+
+  /* ─── WHATIF TABLE ────────────────────────────────── */
+  .whatif-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .whatif-table th {
+    padding: 10px 14px; text-align: left;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.4px;
+    text-transform: uppercase; color: var(--text-muted);
+    border-bottom: 2px solid var(--border);
+  }
+  .whatif-table td {
+    padding: 10px 14px; border-bottom: 1px solid var(--border);
+    font-weight: 500;
+  }
+  .whatif-table tr:hover td { background: var(--surface2); }
+  .uplift-chip {
+    padding: 2px 8px; border-radius: 10px;
+    font-size: 11px; font-weight: 700;
+    background: rgba(29,158,107,0.1); color: var(--accent3);
+  }
+
+  /* ─── CHANNEL CARDS ───────────────────────────────── */
+  .channel-row {
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .channel-row:last-child { border-bottom: none; }
+  .channel-dot {
+    width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
+  }
+  .channel-name { font-size: 13px; font-weight: 700; flex: 1; }
+  .channel-bar-wrap { flex: 2; background: var(--border); border-radius: 20px; height: 8px; }
+  .channel-bar-fill { height: 100%; border-radius: 20px; }
+  .channel-stat { font-size: 12px; font-weight: 600; text-align: right; width: 80px; color: var(--text-secondary); }
+
+  /* ─── MERCHANT TABLE ──────────────────────────────── */
+  .merch-row {
+    display: grid; grid-template-columns: 1fr auto auto;
+    gap: 12px; align-items: center;
+    padding: 10px 0; border-bottom: 1px solid var(--border);
+  }
+  .merch-row:last-child { border-bottom: none; }
+  .merch-name { font-size: 13px; font-weight: 600; }
+  .merch-gmv { font-size: 12px; color: var(--text-secondary); font-weight: 500; }
+  .merch-margin {
+    font-size: 12px; font-weight: 700;
+    padding: 3px 10px; border-radius: 20px;
+    background: rgba(29,158,107,0.1); color: var(--accent3);
+  }
+
+  /* ─── STICKINESS ──────────────────────────────────── */
+  .sticky-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 7px 0;
+  }
+  .sticky-month { font-size: 11.5px; font-weight: 600; width: 70px; color: var(--text-secondary); }
+  .sticky-track { flex: 1; background: var(--border); height: 7px; border-radius: 10px; }
+  .sticky-fill { height: 100%; border-radius: 10px; background: var(--accent1); }
+  .sticky-pct { font-size: 11.5px; font-weight: 700; width: 44px; text-align: right; }
+
+  /* ─── ANIMATIONS ──────────────────────────────────── */
+  @keyframes fadeUp {
+    from { opacity:0; transform: translateY(16px); }
+    to   { opacity:1; transform: translateY(0); }
+  }
+  .card, .stat-card {
+    animation: fadeUp 0.45s ease both;
+  }
+  .card:nth-child(1),.stat-card:nth-child(1) { animation-delay: 0.05s; }
+  .card:nth-child(2),.stat-card:nth-child(2) { animation-delay: 0.10s; }
+  .card:nth-child(3),.stat-card:nth-child(3) { animation-delay: 0.15s; }
+  .card:nth-child(4),.stat-card:nth-child(4) { animation-delay: 0.20s; }
+
+  /* ─── DIVIDER BANNER ──────────────────────────────── */
+  .section-banner {
+    background: linear-gradient(135deg, var(--text-primary) 0%, #2d2825 100%);
+    color: #fff; border-radius: var(--radius);
+    padding: 18px 26px;
+    display: flex; align-items: center; justify-content: space-between;
+    margin: 36px 0 20px;
+  }
+  .section-banner h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 16px; font-weight: 700;
+  }
+  .section-banner p { font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 2px; }
+
+  canvas { display: block; }
+
+  /* ─── SCROLLBAR ───────────────────────────────────── */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--border); }
+  ::-webkit-scrollbar-thumb { background: var(--text-muted); border-radius: 10px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>UPI Deep Intelligence Dashboard</h1>
+    <p>Advanced Analytics · Customer Lifecycle · Revenue Scenarios · FY 2025</p>
+  </div>
+  <div class="header-badge">
+    <span class="badge badge-blue">50K Transactions</span>
+    <span class="badge badge-green">14.38K Customers</span>
+    <span class="badge badge-warn">FY 2025</span>
+  </div>
+</header>
+
+<main>
+
+  <!-- ── SECTION 1 · CUSTOMER HEALTH SNAPSHOT ──────────────── -->
+  <div class="section-label">Customer Health Snapshot</div>
+  <div class="grid-5">
+    <div class="stat-card blue">
+      <div class="stat-icon icon-blue">🏆</div>
+      <div class="stat-value">2,339</div>
+      <div class="stat-label">Champions</div>
+      <span class="stat-delta delta-up">▲ 16.3% of users</span>
+    </div>
+    <div class="stat-card green">
+      <div class="stat-icon icon-green">💚</div>
+      <div class="stat-value">3,910</div>
+      <div class="stat-label">Loyal Users</div>
+      <span class="stat-delta delta-up">▲ Largest segment</span>
+    </div>
+    <div class="stat-card amber">
+      <div class="stat-icon icon-amber">⚡</div>
+      <div class="stat-value">3,505</div>
+      <div class="stat-label">Active Users</div>
+      <span class="stat-delta delta-up">▲ Low churn risk</span>
+    </div>
+    <div class="stat-card orange">
+      <div class="stat-icon icon-orange">⚠️</div>
+      <div class="stat-value">7,860</div>
+      <div class="stat-label">High Churn Risk</div>
+      <span class="stat-delta delta-down">▼ 54.7% of base</span>
+    </div>
+    <div class="stat-card violet">
+      <div class="stat-icon icon-violet">📊</div>
+      <div class="stat-value">3.73%</div>
+      <div class="stat-label">Avg DAU/MAU</div>
+      <span class="stat-delta delta-neu">→ Stable stickiness</span>
+    </div>
+  </div>
+
+  <!-- ── SECTION 2 · RFM + CHURN ───────────────────────────── -->
+  <div class="section-banner">
+    <div>
+      <h2>Customer Segmentation & Retention</h2>
+      <p>RFM scoring, churn risk funnel, cohort retention analysis</p>
+    </div>
+    <span style="font-size:28px;">👥</span>
+  </div>
+
+  <div class="grid-2">
+    <!-- RFM Segments -->
+    <div class="card">
+      <div class="card-title">RFM Customer Segments</div>
+      <div class="card-sub">Recency · Frequency · Monetary value scoring across 14,379 customers</div>
+      <div class="rfm-grid">
+        <div class="rfm-pill rfm-champions">
+          <div class="name">Champions</div>
+          <div class="count">2,339</div>
+          <div class="pct">16.3%</div>
+        </div>
+        <div class="rfm-pill rfm-loyal">
+          <div class="name">Loyal Users</div>
+          <div class="count">3,910</div>
+          <div class="pct">27.2%</div>
+        </div>
+        <div class="rfm-pill rfm-potential">
+          <div class="name">Potential Loyalists</div>
+          <div class="count">947</div>
+          <div class="pct">6.6%</div>
+        </div>
+        <div class="rfm-pill rfm-new">
+          <div class="name">New Customers</div>
+          <div class="count">1,432</div>
+          <div class="pct">10.0%</div>
+        </div>
+        <div class="rfm-pill rfm-atrisk">
+          <div class="name">At Risk</div>
+          <div class="count">2,378</div>
+          <div class="pct">16.5%</div>
+        </div>
+        <div class="rfm-pill rfm-hibernate">
+          <div class="name">Hibernating</div>
+          <div class="count">1,348</div>
+          <div class="pct">9.4%</div>
+        </div>
+        <div class="rfm-pill rfm-lost">
+          <div class="name">Lost Customers</div>
+          <div class="count">1,168</div>
+          <div class="pct">8.1%</div>
+        </div>
+        <div class="rfm-pill rfm-cantlose">
+          <div class="name">Can't Lose Them</div>
+          <div class="count">857</div>
+          <div class="pct">6.0%</div>
+        </div>
+      </div>
+      <div style="margin-top:18px;">
+        <div class="chart-wrap" style="height:170px;">
+          <canvas id="rfmDonut"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Churn Risk Funnel -->
+    <div class="card">
+      <div class="card-title">Churn Risk Distribution</div>
+      <div class="card-sub">User lifecycle health — based on transaction recency and 90-day activity</div>
+      <div style="margin-top: 10px;">
+        <div class="funnel-bar">
+          <div class="funnel-label" style="color:#e35c2d;">High Risk</div>
+          <div class="funnel-track">
+            <div class="funnel-fill" style="width:54.7%;background:linear-gradient(90deg,#e35c2d,#f2845a);">54.7%</div>
+          </div>
+          <div class="funnel-count">7,860</div>
+        </div>
+        <div class="funnel-bar">
+          <div class="funnel-label" style="color:#1d9e6b;">Active</div>
+          <div class="funnel-track">
+            <div class="funnel-fill" style="width:24.4%;background:linear-gradient(90deg,#1d9e6b,#41c99a);">24.4%</div>
+          </div>
+          <div class="funnel-count">3,505</div>
+        </div>
+        <div class="funnel-bar">
+          <div class="funnel-label" style="color:#c47d12;">Medium Risk</div>
+          <div class="funnel-track">
+            <div class="funnel-fill" style="width:21.0%;background:linear-gradient(90deg,#c47d12,#e6a530);">21.0%</div>
+          </div>
+          <div class="funnel-count">3,012</div>
+        </div>
+        <div class="funnel-bar">
+          <div class="funnel-label" style="color:#8b3fc7;">Slipping Away</div>
+          <div class="funnel-track">
+            <div class="funnel-fill" style="width:0.5%;background:linear-gradient(90deg,#8b3fc7,#b06eee);min-width:24px;">0%</div>
+          </div>
+          <div class="funnel-count">2</div>
+        </div>
+      </div>
+
+      <div style="margin-top:24px; padding-top: 20px; border-top: 1px solid var(--border);">
+        <div class="card-title" style="margin-bottom:8px;">Insight Callouts</div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div style="background:rgba(227,92,45,0.06);border:1px solid rgba(227,92,45,0.18);border-radius:10px;padding:12px 14px;font-size:12px;">
+            <strong style="color:#e35c2d;">⚠ Risk Alert:</strong> 7,860 users (55%) are classified High Risk. Immediate win-back campaigns could recover significant GMV.
+          </div>
+          <div style="background:rgba(29,158,107,0.06);border:1px solid rgba(29,158,107,0.18);border-radius:10px;padding:12px 14px;font-size:12px;">
+            <strong style="color:#1d9e6b;">✓ Strength:</strong> 2,339 Champions + 3,910 Loyal Users = 43.5% of base generating disproportionate revenue.
+          </div>
+          <div style="background:rgba(196,125,18,0.06);border:1px solid rgba(196,125,18,0.18);border-radius:10px;padding:12px 14px;font-size:12px;">
+            <strong style="color:#c47d12;">💡 Opportunity:</strong> 857 "Can't Lose Them" users need urgent personalised re-engagement.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cohort Retention Heatmap -->
+  <div class="card" style="margin-top:20px;">
+    <div class="card-title">Cohort Retention Heatmap</div>
+    <div class="card-sub">Monthly cohorts · % of original cohort still transacting each subsequent month</div>
+    <div class="cohort-wrap">
+      <table class="cohort-table" id="cohortTable">
+        <thead>
+          <tr>
+            <th style="text-align:left;">Cohort</th>
+            <th>M+0</th><th>M+1</th><th>M+2</th><th>M+3</th><th>M+4</th>
+            <th>M+5</th><th>M+6</th><th>M+7</th><th>M+8</th><th>M+9</th>
+            <th>M+10</th><th>M+11</th>
+          </tr>
+        </thead>
+        <tbody id="cohortBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ── SECTION 3 · ENGAGEMENT & STICKINESS ───────────────── -->
+  <div class="section-banner" style="margin-top:32px;">
+    <div>
+      <h2>Engagement & Platform Stickiness</h2>
+      <p>DAU/MAU ratio, monthly active users, and engagement trends</p>
+    </div>
+    <span style="font-size:28px;">📈</span>
+  </div>
+
+  <div class="grid-2">
+    <!-- DAU/MAU Stickiness -->
+    <div class="card">
+      <div class="card-title">DAU / MAU Stickiness Ratio</div>
+      <div class="card-sub">Higher = users transacting more frequently within the month</div>
+      <div style="margin-top: 6px;">
+        <div class="sticky-row" v-for="m in months">
+          <div class="sticky-month">Jan</div>
+          <div class="sticky-track"><div class="sticky-fill" style="width:73.8%;background:var(--accent1);"></div></div>
+          <div class="sticky-pct" style="color:var(--accent1);">3.69%</div>
+        </div>
+        <div class="sticky-row">
+          <div class="sticky-month">Feb</div>
+          <div class="sticky-track"><div class="sticky-fill" style="width:80.3%;background:var(--accent3);"></div></div>
+          <div class="sticky-pct" style="color:var(--accent3);">4.02%</div>
+        </div>
+        <div class="sticky-row">
+          <div class="sticky-month">Mar</div>
+          <div class="sticky-track"><div class="sticky-fill" style="width:72.7%;background:var(--accent1);"></div></div>
+          <div class="sticky-pct" style="color:var(--accent1);">3.64%</div>
+        </div>
+        <div class="sticky-row">
+          <div class="sticky-month">Apr</div>
+          <div class="sticky-track"><div class="sticky-fill" style="width:74.6%;background:var(--accent1);"></div></div>
+          <div class="sticky-pct" style="color:var(--accent1);">3.73%</div>
+        </div>
+        <div class="sticky-row">
+          <div class="sticky-month">May</div>
+          <div class="sticky-track"><div class="sticky-fill" style="width:73.3%;background:var(--accent1);"></div></div>
+          <div class="sticky-pct" style="color:var(--accent1);">3.67%</div>
+        </div>
+        <div class="sticky-row">
+          <div class="sticky-month">Jun</div>
+          <div class="sticky-track"><div class="sticky-fill" style="width:74.5%;background:var(--accent1);"></div></div>
+          <div class="sticky-pct" style="color:var(--accent1);">3.73%</div>
+        </div>
+        <div class="sticky-row">
+          <div class="sticky-month">Jul</div>
+          <div class="sticky-track"><div class="sticky-fill" style="width:73.6%;background:var(--accent1);"></div></div>
+          <div class="sticky-pct" style="color:var(--accent1);">3.68%</div>
+        </div>
+        <div class="sticky-row">
+          <div class="sticky-month">Aug</div>
+          <div class="sticky-track"><div class="sticky-fill" style="width:73.4%;background:var(--accent1);"></div></div>
+          <div class="sticky-pct" style="color:var(--accent1);">3.67%</div>
+        </div>
+        <div class="sticky-row">
+          <div class="sticky-month">Sep</div>
+          <div class="sticky-track"><div class="sticky-fill" style="width:75.1%;background:var(--accent3);"></div></div>
+          <div class="sticky-pct" style="color:var(--accent3);">3.76%</div>
+        </div>
+        <div class="sticky-row">
+          <div class="sticky-month">Oct</div>
+          <div class="sticky-track"><div class="sticky-fill" style="width:72.9%;background:var(--accent1);"></div></div>
+          <div class="sticky-pct" style="color:var(--accent1);">3.65%</div>
+        </div>
+        <div class="sticky-row">
+          <div class="sticky-month">Nov</div>
+          <div class="sticky-track"><div class="sticky-fill" style="width:75.6%;background:var(--accent3);"></div></div>
+          <div class="sticky-pct" style="color:var(--accent3);">3.78%</div>
+        </div>
+        <div class="sticky-row">
+          <div class="sticky-month">Dec</div>
+          <div class="sticky-track"><div class="sticky-fill" style="width:73.6%;background:var(--accent1);"></div></div>
+          <div class="sticky-pct" style="color:var(--accent1);">3.68%</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MAU Trend Chart -->
+    <div class="card">
+      <div class="card-title">Monthly Active Users (MAU) Trend</div>
+      <div class="card-sub">Unique users transacting each month — Jan to Dec 2025</div>
+      <div class="chart-wrap" style="height:300px;">
+        <canvas id="mauChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SECTION 4 · CHANNEL DEEP-DIVE ─────────────────────── -->
+  <div class="section-banner" style="margin-top:32px;">
+    <div>
+      <h2>Channel Performance Deep-Dive</h2>
+      <p>Margin, efficiency ratios, and monthly channel revenue trends</p>
+    </div>
+    <span style="font-size:28px;">💳</span>
+  </div>
+
+  <div class="grid-2">
+    <!-- Channel Margin Comparison -->
+    <div class="card">
+      <div class="card-title">Channel Efficiency & Margin</div>
+      <div class="card-sub">Margin % and GMV share per payment channel</div>
+      <div style="margin-top:8px;">
+        <div class="channel-row">
+          <div class="channel-dot" style="background:#2d5be3;"></div>
+          <div class="channel-name">UPI</div>
+          <div class="channel-bar-wrap"><div class="channel-bar-fill" style="width:70.4%;background:#2d5be3;"></div></div>
+          <div class="channel-stat">29.9% margin</div>
+        </div>
+        <div class="channel-row">
+          <div class="channel-dot" style="background:#1d9e6b;"></div>
+          <div class="channel-name">WALLET</div>
+          <div class="channel-bar-wrap"><div class="channel-bar-fill" style="width:9.9%;background:#1d9e6b;"></div></div>
+          <div class="channel-stat">32.6% margin</div>
+        </div>
+        <div class="channel-row">
+          <div class="channel-dot" style="background:#e35c2d;"></div>
+          <div class="channel-name">CARD</div>
+          <div class="channel-bar-wrap"><div class="channel-bar-fill" style="width:14.9%;background:#e35c2d;"></div></div>
+          <div class="channel-stat">27.6% margin</div>
+        </div>
+        <div class="channel-row">
+          <div class="channel-dot" style="background:#c47d12;"></div>
+          <div class="channel-name">NETBANKING</div>
+          <div class="channel-bar-wrap"><div class="channel-bar-fill" style="width:4.7%;background:#c47d12;"></div></div>
+          <div class="channel-stat">29.6% margin</div>
+        </div>
+      </div>
+      <div style="margin-top:20px;" class="chart-wrap" style="height:180px;">
+        <canvas id="channelMarginChart" style="height:180px;"></canvas>
+      </div>
+    </div>
+
+    <!-- Monthly Channel Trend -->
+    <div class="card">
+      <div class="card-title">Monthly GMV by Channel</div>
+      <div class="card-sub">Channel contribution trend throughout FY 2025</div>
+      <div class="chart-wrap" style="height:290px;">
+        <canvas id="channelTrendChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SECTION 5 · MERCHANT CATEGORIES ──────────────────── -->
+  <div class="section-banner" style="margin-top:32px;">
+    <div>
+      <h2>Merchant Category Analysis</h2>
+      <p>GMV distribution, margins, and cashback spend by category</p>
+    </div>
+    <span style="font-size:28px;">🛍️</span>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">Category GMV & Margin Breakdown</div>
+      <div class="card-sub">Revenue performance across merchant verticals</div>
+      <div style="margin-top:8px;">
+        <div class="merch-row">
+          <div class="merch-name">🚌 Transport</div>
+          <div class="merch-gmv">₹28.1L GMV · 9,396 txns</div>
+          <div class="merch-margin">27.6%</div>
+        </div>
+        <div class="merch-row">
+          <div class="merch-name">✈️ Travel</div>
+          <div class="merch-gmv">₹25.1L GMV · 8,454 txns</div>
+          <div class="merch-margin">32.1%</div>
+        </div>
+        <div class="merch-row">
+          <div class="merch-name">🛒 Retail</div>
+          <div class="merch-gmv">₹23.4L GMV · 7,735 txns</div>
+          <div class="merch-margin">33.2%</div>
+        </div>
+        <div class="merch-row">
+          <div class="merch-name">🍔 Food</div>
+          <div class="merch-gmv">₹22.9L GMV · 7,623 txns</div>
+          <div class="merch-margin">30.8%</div>
+        </div>
+        <div class="merch-row">
+          <div class="merch-name">⚡ Utilities</div>
+          <div class="merch-gmv">₹22.3L GMV · 7,423 txns</div>
+          <div class="merch-margin">27.6%</div>
+        </div>
+        <div class="merch-row">
+          <div class="merch-name">🎬 Entertainment</div>
+          <div class="merch-gmv">₹21.0L GMV · 6,917 txns</div>
+          <div class="merch-margin">27.5%</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Merchant Category Distribution</div>
+      <div class="card-sub">GMV share and net revenue by vertical</div>
+      <div class="chart-wrap" style="height:280px;">
+        <canvas id="merchantChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SECTION 6 · CLV + CASHBACK ROI ───────────────────── -->
+  <div class="section-banner" style="margin-top:32px;">
+    <div>
+      <h2>CLV Distribution & Cashback ROI</h2>
+      <p>Customer lifetime value tiers and cashback investment returns</p>
+    </div>
+    <span style="font-size:28px;">💰</span>
+  </div>
+
+  <div class="grid-2">
+    <!-- CLV Distribution -->
+    <div class="card">
+      <div class="card-title">Cashback ROI Trend</div>
+      <div class="card-sub">Monthly GMV generated per ₹1 of cashback spend — efficiency of cashback investment</div>
+      <div class="chart-wrap" style="height:260px;">
+        <canvas id="cashbackRoiChart"></canvas>
+      </div>
+    </div>
+
+    <!-- Monthly Net Revenue vs Cashback -->
+    <div class="card">
+      <div class="card-title">Net Revenue vs Cashback Cost</div>
+      <div class="card-sub">Monthly comparison — high cashback months often depress net revenue</div>
+      <div class="chart-wrap" style="height:260px;">
+        <canvas id="revCashbackChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SECTION 7 · WHAT-IF SCENARIOS ────────────────────── -->
+  <div class="section-banner" style="margin-top:32px;">
+    <div>
+      <h2>Revenue What-If Scenarios</h2>
+      <p>Projected uplift from cashback reduction + MDR rate increase combinations</p>
+    </div>
+    <span style="font-size:28px;">🔭</span>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">Scenario Comparison Matrix</div>
+      <div class="card-sub">Baseline: ₹42.5K net revenue at 0% changes. All projections annualised.</div>
+      <div style="overflow-x:auto;">
+        <table class="whatif-table">
+          <thead>
+            <tr>
+              <th>Cashback Cut</th>
+              <th>MDR Increase</th>
+              <th>Projected Rev</th>
+              <th>Margin %</th>
+              <th>Uplift</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>0%</td><td>0.25%</td><td>₹78,207</td><td>0.55%</td>
+              <td><span class="uplift-chip">+₹35,675</span></td>
+            </tr>
+            <tr>
+              <td>0%</td><td>0.50%</td><td>₹1,13,882</td><td>0.80%</td>
+              <td><span class="uplift-chip">+₹71,350</span></td>
+            </tr>
+            <tr>
+              <td>5%</td><td>0%</td><td>₹47,534</td><td>0.34%</td>
+              <td><span class="uplift-chip">+₹5,003</span></td>
+            </tr>
+            <tr>
+              <td>10%</td><td>0%</td><td>₹52,537</td><td>0.38%</td>
+              <td><span class="uplift-chip">+₹10,006</span></td>
+            </tr>
+            <tr>
+              <td>10%</td><td>0.25%</td><td>₹87,142</td><td>0.63%</td>
+              <td><span class="uplift-chip">+₹44,610</span></td>
+            </tr>
+            <tr>
+              <td>15%</td><td>0.25%</td><td>₹91,610</td><td>0.67%</td>
+              <td><span class="uplift-chip">+₹49,078</span></td>
+            </tr>
+            <tr>
+              <td>20%</td><td>0.50%</td><td>₹1,29,612</td><td>0.97%</td>
+              <td><span class="uplift-chip">+₹87,080</span></td>
+            </tr>
+            <tr style="background:rgba(45,91,227,0.04);font-weight:700;">
+              <td>20%</td><td>1.00%</td><td>₹1,87,459</td><td>1.40%</td>
+              <td><span class="uplift-chip" style="background:rgba(45,91,227,0.15);color:var(--accent1);">+₹1,44,928</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">What-If Revenue Waterfall</div>
+      <div class="card-sub">Revenue uplift across scenarios — selected MDR increase combinations</div>
+      <div class="chart-wrap" style="height:300px;">
+        <canvas id="whatifChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+/* ════════════════════════════════════════════════════
+   CHART DEFAULTS
+   ════════════════════════════════════════════════════ */
+Chart.defaults.font.family = "'Figtree', sans-serif";
+Chart.defaults.font.size   = 11.5;
+Chart.defaults.color       = '#6b6560';
+Chart.defaults.plugins.legend.labels.usePointStyle = true;
+Chart.defaults.plugins.legend.labels.pointStyle    = 'circle';
+Chart.defaults.plugins.legend.labels.boxWidth      = 8;
+Chart.defaults.plugins.tooltip.backgroundColor     = '#1a1714';
+Chart.defaults.plugins.tooltip.titleColor          = '#fff';
+Chart.defaults.plugins.tooltip.bodyColor           = 'rgba(255,255,255,0.75)';
+Chart.defaults.plugins.tooltip.padding             = 10;
+Chart.defaults.plugins.tooltip.cornerRadius        = 10;
+
+/* ════════════════════════════════════════════════════
+   COHORT RETENTION HEATMAP
+   ════════════════════════════════════════════════════ */
+const cohortData = {
+  '2025-01': [100,21.7,23.4,22.3,24.0,22.1,24.7,24.9,23.9,24.8,23.8,23.0],
+  '2025-02': [100,23.8,21.0,24.8,22.6,24.1,24.3,null,null,null,null,null],
+  '2025-03': [100,22.4,23.9,23.1,23.7,24.4,null,null,null,null,null,null],
+  '2025-04': [100,23.5,22.8,24.2,23.9,null,null,null,null,null,null,null],
+  '2025-05': [100,24.1,23.3,23.7,null,null,null,null,null,null,null,null],
+  '2025-06': [100,22.9,24.4,null,null,null,null,null,null,null,null,null],
+  '2025-07': [100,23.7,null,null,null,null,null,null,null,null,null,null],
+};
+
+function pctToColor(pct) {
+  if (pct === null) return '#f0ede6';
+  if (pct === 100) return '#1a1714';
+  const stops = [
+    [0,   '#fce4d4'],
+    [15,  '#f9b98f'],
+    [20,  '#74c2a0'],
+    [25,  '#2d5be3'],
+    [100, '#1a1714'],
+  ];
+  for (let i = 0; i < stops.length - 1; i++) {
+    const [v0, c0] = stops[i];
+    const [v1, c1] = stops[i + 1];
+    if (pct >= v0 && pct <= v1) {
+      const t = (pct - v0) / (v1 - v0);
+      return lerpColor(c0, c1, t);
+    }
+  }
+  return stops[stops.length-1][1];
+}
+
+function lerpColor(a, b, t) {
+  const ah = parseInt(a.slice(1), 16), bh = parseInt(b.slice(1), 16);
+  const ar = ah>>16, ag = (ah>>8)&0xff, ab = ah&0xff;
+  const br = bh>>16, bg = (bh>>8)&0xff, bb = bh&0xff;
+  const rr = Math.round(ar + (br-ar)*t);
+  const rg = Math.round(ag + (bg-ag)*t);
+  const rb = Math.round(ab + (bb-ab)*t);
+  return `rgb(${rr},${rg},${rb})`;
+}
+
+const tbody = document.getElementById('cohortBody');
+Object.entries(cohortData).forEach(([cohort, vals]) => {
+  const tr = document.createElement('tr');
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const cidx = parseInt(cohort.split('-')[1]) - 1;
+  let html = `<td class="month-label">${months[cidx]} ${cohort.split('-')[0]}</td>`;
+  vals.forEach(v => {
+    const bg = v !== null ? pctToColor(v) : '#f0ede6';
+    const color = (v === 100 || (v !== null && v >= 23)) ? '#fff' : '#3a3530';
+    const txt = v !== null ? (v === 100 ? '100%' : v.toFixed(1)+'%') : '—';
+    html += `<td style="background:${bg};color:${color};border-radius:6px;padding:7px 8px;">${txt}</td>`;
+  });
+  tr.innerHTML = html;
+  tbody.appendChild(tr);
+});
+
+/* ════════════════════════════════════════════════════
+   RFM DONUT
+   ════════════════════════════════════════════════════ */
+new Chart(document.getElementById('rfmDonut'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Champions','Loyal Users','At Risk','New Customers','Hibernating','Lost','Pot. Loyalists','Can\'t Lose'],
+    datasets: [{
+      data: [2339,3910,2378,1432,1348,1168,947,857],
+      backgroundColor: ['#2d5be3','#1d9e6b','#e35c2d','#8b3fc7','#9e8a7c','#4a4540','#c47d12','#c41212'],
+      borderWidth: 2, borderColor: '#fff',
+      hoverOffset: 8,
+    }]
+  },
+  options: {
+    cutout: '65%',
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { position: 'right', labels: { fontSize: 10, padding: 8 } },
+      tooltip: { callbacks: {
+        label: (c) => ` ${c.label}: ${c.raw.toLocaleString()} (${(c.raw/14379*100).toFixed(1)}%)`
+      }}
+    }
+  }
+});
+
+/* ════════════════════════════════════════════════════
+   MAU CHART
+   ════════════════════════════════════════════════════ */
+new Chart(document.getElementById('mauChart'), {
+  type: 'line',
+  data: {
+    labels: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
+    datasets: [{
+      label: 'MAU',
+      data: [3488,3272,3479,3357,3639,3356,3612,3589,3484,3509,3540,3505],
+      borderColor: '#2d5be3', backgroundColor: 'rgba(45,91,227,0.08)',
+      borderWidth: 2.5, fill: true, tension: 0.4,
+      pointBackgroundColor: '#2d5be3', pointRadius: 4, pointHoverRadius: 7,
+    },{
+      label: 'Avg DAU × 30',
+      data: [3861,3729,3803,3755,4004,3751,3989,3949,3926,3840,4017,3867],
+      borderColor: '#e35c2d', backgroundColor: 'rgba(227,92,45,0.05)',
+      borderWidth: 1.5, fill: false, tension: 0.4, borderDash: [5,4],
+      pointRadius: 3,
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { position: 'top' } },
+    scales: {
+      x: { grid: { color: '#f0ede6' } },
+      y: { grid: { color: '#f0ede6' }, ticks: { callback: v => v.toLocaleString() } }
+    }
+  }
+});
+
+/* ════════════════════════════════════════════════════
+   CHANNEL MARGIN CHART
+   ════════════════════════════════════════════════════ */
+new Chart(document.getElementById('channelMarginChart'), {
+  type: 'bar',
+  data: {
+    labels: ['UPI','WALLET','CARD','NETBANKING'],
+    datasets: [{
+      label: 'Margin %',
+      data: [29.9, 32.6, 27.6, 29.6],
+      backgroundColor: ['rgba(45,91,227,0.85)','rgba(29,158,107,0.85)','rgba(227,92,45,0.85)','rgba(196,125,18,0.85)'],
+      borderRadius: 8, borderSkipped: false,
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    indexAxis: 'y',
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { grid: { color: '#f0ede6' }, ticks: { callback: v => v+'%' }, max: 40 },
+      y: { grid: { display: false } }
+    }
+  }
+});
+
+/* ════════════════════════════════════════════════════
+   CHANNEL TREND CHART (stacked area)
+   ════════════════════════════════════════════════════ */
+new Chart(document.getElementById('channelTrendChart'), {
+  type: 'line',
+  data: {
+    labels: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
+    datasets: [
+      { label: 'UPI',        data: [851376,813135,844329,765800,846447,812124,901531,878418,821147,849256,846447,821371],
+        borderColor:'#2d5be3', backgroundColor:'rgba(45,91,227,0.12)', fill:true, tension:0.4, borderWidth:2, pointRadius:2 },
+      { label: 'CARD',       data: [177571,176219,169217,182265,190606,170127,191529,178248,173561,180241,178248,174880],
+        borderColor:'#e35c2d', backgroundColor:'rgba(227,92,45,0.08)', fill:true, tension:0.4, borderWidth:2, pointRadius:2 },
+      { label: 'WALLET',     data: [122323,106914,109746,106381,118262,110832,124578,115694,109248,115136,116408,111278],
+        borderColor:'#1d9e6b', backgroundColor:'rgba(29,158,107,0.07)', fill:true, tension:0.4, borderWidth:2, pointRadius:2 },
+      { label: 'NETBANKING', data: [58876,45581,69321,57540,61787,45430,64022,57782,54419,55562,54574,61307],
+        borderColor:'#c47d12', backgroundColor:'rgba(196,125,18,0.06)', fill:true, tension:0.4, borderWidth:2, pointRadius:2 },
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { position: 'top' } },
+    scales: {
+      x: { grid: { color: '#f0ede6' } },
+      y: { grid: { color: '#f0ede6' }, stacked: false, ticks: { callback: v => '₹'+(v/1000).toFixed(0)+'K' } }
+    }
+  }
+});
+
+/* ════════════════════════════════════════════════════
+   MERCHANT CATEGORY CHART
+   ════════════════════════════════════════════════════ */
+new Chart(document.getElementById('merchantChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Transport','Travel','Retail','Food','Utilities','Entertainment'],
+    datasets: [
+      { label: 'GMV (₹L)', data: [28.1,25.1,23.4,22.9,22.3,21.0],
+        backgroundColor: ['rgba(45,91,227,0.85)','rgba(29,158,107,0.85)','rgba(227,92,45,0.85)','rgba(196,125,18,0.85)','rgba(139,63,199,0.85)','rgba(107,101,96,0.85)'],
+        borderRadius: 8, borderSkipped: false, yAxisID: 'y' },
+      { label: 'Net Rev (₹K)', data: [7.74,8.07,7.76,7.05,6.14,5.77],
+        type: 'line', borderColor: '#1a1714', borderWidth: 2, pointRadius: 5,
+        pointBackgroundColor: '#1a1714', tension: 0.4, yAxisID: 'y2', fill: false },
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { position: 'top' } },
+    scales: {
+      x: { grid: { display: false } },
+      y:  { position: 'left',  grid: { color: '#f0ede6' }, ticks: { callback: v => '₹'+v+'L' } },
+      y2: { position: 'right', grid: { display: false }, ticks: { callback: v => '₹'+v+'K' } },
+    }
+  }
+});
+
+/* ════════════════════════════════════════════════════
+   CASHBACK ROI
+   ════════════════════════════════════════════════════ */
+new Chart(document.getElementById('cashbackRoiChart'), {
+  type: 'line',
+  data: {
+    labels: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
+    datasets: [{
+      label: 'GMV per ₹1 Cashback',
+      data: [91.8,81.8,88.0,92.9,87.7,94.0,92.6,88.9,80.4,88.2,100.6,80.0],
+      borderColor: '#2d5be3', backgroundColor: 'rgba(45,91,227,0.08)',
+      fill: true, tension: 0.4, borderWidth: 2.5,
+      pointBackgroundColor: (ctx) => ctx.raw >= 95 ? '#1d9e6b' : ctx.raw <= 82 ? '#e35c2d' : '#2d5be3',
+      pointRadius: 5, pointHoverRadius: 8,
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      annotation: {},
+      tooltip: { callbacks: { label: c => ` ₹${c.raw} GMV per ₹1 cashback` } }
+    },
+    scales: {
+      x: { grid: { color: '#f0ede6' } },
+      y: { grid: { color: '#f0ede6' }, min: 70, ticks: { callback: v => '₹'+v } }
+    }
+  }
+});
+
+/* ════════════════════════════════════════════════════
+   NET REVENUE vs CASHBACK
+   ════════════════════════════════════════════════════ */
+new Chart(document.getElementById('revCashbackChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
+    datasets: [
+      { label: 'Net Revenue (₹)',
+        data: [4110,2509,3484,4068,3635,4154,4400,3696,2015,3458,5167,1834],
+        backgroundColor: 'rgba(45,91,227,0.85)', borderRadius: 6, borderSkipped: false },
+      { label: 'Cashback Cost (₹)',
+        data: [-13187,-13960,-13556,-11965,-13915,-12106,-13843,-13844,-14415,-13611,-11890,-14870],
+        backgroundColor: 'rgba(227,92,45,0.75)', borderRadius: 6, borderSkipped: false },
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { position: 'top' } },
+    scales: {
+      x: { grid: { display: false } },
+      y: { grid: { color: '#f0ede6' }, ticks: { callback: v => '₹'+(v/1000).toFixed(1)+'K' } }
+    }
+  }
+});
+
+/* ════════════════════════════════════════════════════
+   WHATIF SCENARIOS CHART
+   ════════════════════════════════════════════════════ */
+new Chart(document.getElementById('whatifChart'), {
+  type: 'bar',
+  data: {
+    labels: [
+      'Baseline\n(0%/0%)', '+0.25% MDR', '+0.50% MDR', '+1.00% MDR',
+      '-10% CB\n+0%MDR', '-10% CB\n+0.25%', '-20% CB\n+0.50%', '-20% CB\n+1.0%'
+    ],
+    datasets: [{
+      label: 'Net Revenue (₹)',
+      data: [42532, 78207, 113882, 185232, 52537, 87142, 129612, 187459],
+      backgroundColor: [
+        'rgba(107,101,96,0.7)',
+        'rgba(45,91,227,0.75)','rgba(45,91,227,0.85)','rgba(45,91,227,0.95)',
+        'rgba(29,158,107,0.75)','rgba(29,158,107,0.85)',
+        'rgba(196,125,18,0.85)','rgba(196,125,18,0.95)',
+      ],
+      borderRadius: 8, borderSkipped: false,
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: { callbacks: { label: c => ` Net Revenue: ₹${c.raw.toLocaleString()}` } }
+    },
+    scales: {
+      x: { grid: { display: false }, ticks: { maxRotation: 30 } },
+      y: { grid: { color: '#f0ede6' }, ticks: { callback: v => '₹'+(v/1000).toFixed(0)+'K' } }
+    }
+  }
+});
+</script>
+</body>
+</html>
